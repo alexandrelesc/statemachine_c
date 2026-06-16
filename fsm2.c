@@ -1,96 +1,102 @@
 #include <stdio.h>
-#include <stdlib.h>
 
-
-//variaveis globais:
-void (*PonteiroDeFuncao)(); //ponteiro de função da máquina de estados. Ele aponta sempre para a função da máquina de estados que deve ser executada
-
-//prototypes:
+// Protótipos das funções que representam os estados
 void EstadoInicial(void);       //função que representa o estado inicial da máquina de estados
 void CaracterDigitadoA(void);   //função que representa o estado ao qual já foi digitada a letra 'a'
 void CaracterDigitadoB(void);   //função que representa o estado ao qual já foi digitada a letra 'b'
 void CaracterDigitadoC(void);   //função que representa o estado ao qual já foi digitada a letra 'c'
 
-//Estado inicial da máquina de estados. Somente muda de estado se for digitada a letra 'a'
+// Ponteiro de função que aponta para o estado atual
+void (*PonteiroDeFuncao)(void);
+
+// Função auxiliar para ler uma tecla
+char LerTecla(void)
+{
+    char tecla;
+
+    printf("Digite uma tecla: ");
+    scanf(" %c", &tecla); // ignora ENTER anterior
+
+    return tecla;
+}
+
+// Estado inicial: espera a letra 'a'
 void EstadoInicial(void)
 {
-  char TeclaLida;
-  //faz a leitura da tecla pressionada
-  fflush(stdin); //limpa o buffer de teclado
-  TeclaLida = getchar();
-  getchar();
+    char TeclaLida = LerTecla();
 
-  if (TeclaLida == 'a'){
-    PonteiroDeFuncao = CaracterDigitadoA;
-    printf("Estamos indo para o próximo estado A\r\n");    
-  } else 
-    printf("\n\n- Caracter esperado: a. Permanece no estado inicial\n\n"); 
+    if (TeclaLida == 'a')
+    {
+        PonteiroDeFuncao = CaracterDigitadoA;
+        printf("Letra 'a' correta. Indo para o estado A.\n\n");
+    }
+    else
+    {
+        printf("Caracter esperado: a. Permanece no estado inicial.\n\n");
+    }
 }
 
-//Vai para proximo estado se for digitada a letra 'b'. Caso contrario, volta ao estado inicial (aguardar letra 'a')
+// Estado após digitar 'a': espera a letra 'b'
 void CaracterDigitadoA(void)
 {
-  char TeclaLida;
-  //faz a leitura da tecla pressionada
-  fflush(stdin); //limpa o buffer de teclado
-  TeclaLida = getchar();
-  getchar();
+    char TeclaLida = LerTecla();
 
-  if (TeclaLida == 'b'){
-    PonteiroDeFuncao = CaracterDigitadoB;
-    printf("Estamos indo para o próximo estado B\r\n");
-  } else
-  {
-    printf("\n\n- Caracter esperado: b. Caracter lido: %c. Voltando ao estado inicial\n\n",TeclaLida);
-    PonteiroDeFuncao = EstadoInicial;
-  }
+    if (TeclaLida == 'b')
+    {
+        PonteiroDeFuncao = CaracterDigitadoB;
+        printf("Letra 'b' correta. Indo para o estado B.\n\n");
+    }
+    else
+    {
+        printf("Caracter esperado: b. Voltando ao estado inicial.\n\n");
+        PonteiroDeFuncao = EstadoInicial;
+    }
 }
 
-//Vai para proximo estado se for digitada a letra 'c'. Caso contrario, volta ao estado inicial (aguardar letra 'a')
+// Estado após digitar 'a' e 'b': espera a letra 'c'
 void CaracterDigitadoB(void)
 {
-  char TeclaLida;
-  //faz a leitura da tecla pressionada
-  fflush(stdin); //limpa o buffer de teclado
-  TeclaLida = getchar();
-  getchar();
+    char TeclaLida = LerTecla();
 
-  if (TeclaLida == 'c'){
-    PonteiroDeFuncao = CaracterDigitadoC;
-    printf("Estamos indo para o próximo estado D\r\n"); 
-    }  else
-  {
-    printf("\n\n- Caracter esperado: c. Caracter lido: %c. Voltando ao estado inicial\n\n",TeclaLida);
-    PonteiroDeFuncao = EstadoInicial;
-  } 
+    if (TeclaLida == 'c')
+    {
+        PonteiroDeFuncao = CaracterDigitadoC;
+        printf("Letra 'c' correta. Indo para o estado C.\n\n");
+    }
+    else
+    {
+        printf("Caracter esperado: c. Voltando ao estado inicial.\n\n");
+        PonteiroDeFuncao = EstadoInicial;
+    }
 }
 
-//Valida seqüência se se for digitada a letra 'd'. Caso contrario, volta ao estado inicial (aguardar letra 'a')
+// Estado após digitar 'a', 'b' e 'c': espera a letra 'd'
 void CaracterDigitadoC(void)
 {
-  char TeclaLida;
-  //faz a leitura da tecla pressionada
-  fflush(stdin); //limpa o buffer de teclado
-  TeclaLida = getchar(); 
-  getchar();
+    char TeclaLida = LerTecla();
 
-  if (TeclaLida != 'd')
-    printf("\n\n- Caracter esperado: d. Caracter lido: %c. Voltando ao estado inicial\n\n",TeclaLida);
-  else
-    printf("OK\n\n"); //a seqüência de letras digitada é correta. Escreve "OK" na tela e volta ao estado inicial
+    if (TeclaLida == 'd')
+    {
+        printf("OK! Sequencia correta: a b c d\n\n");
+    }
+    else
+    {
+        printf("Caracter esperado: d. Voltando ao estado inicial.\n\n");
+    }
 
-  PonteiroDeFuncao = EstadoInicial;
+    PonteiroDeFuncao = EstadoInicial;
 }
 
-
-int main(int argc, char *argv[])
+int main(void)
 {
-  PonteiroDeFuncao = EstadoInicial; //aponta para o estado inicial. Nunca esquecer de informar um estado inicial (senão, nesse caso em específico, pode haver um erro fatal / hard fault).
+    // Estado inicial da máquina
+    PonteiroDeFuncao = EstadoInicial;
 
-  while(1)
-  {
-    (*PonteiroDeFuncao)();    //chama a função apontada pelo ponteiro de função (logo, chama o estado corrente)
-  }
-  system("PAUSE"); 
-  return 0;
+    // Executa a máquina continuamente
+    while (1)
+    {
+        PonteiroDeFuncao();
+    }
+
+    return 0;
 }
